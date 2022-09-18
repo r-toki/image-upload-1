@@ -1,18 +1,18 @@
-import { Box, Container } from '@chakra-ui/react';
-import { ReactNode, useEffect, useState } from 'react';
+import { Box, Container, VStack } from '@chakra-ui/react';
+import { ReactNode } from 'react';
+
+import { ImageUploadForm } from './components/ImageUploadForm';
 
 export const App = () => {
-  const [res, setRes] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:8080/')
-      .then((v) => v.json())
-      .then(setRes);
-  }, []);
-
   return (
     <AppLayout>
-      <Box>{res}</Box>
+      <VStack spacing="4">
+        <Box fontWeight="bold" fontSize="xl">
+          Image Upload Form
+        </Box>
+
+        <ImageUploadForm />
+      </VStack>
     </AppLayout>
   );
 };
@@ -22,8 +22,10 @@ type AppLayoutProps = {
 };
 const AppLayout = (props: AppLayoutProps) => {
   return (
-    <Box h="full" bg="gray.50">
-      <Container py="4">{props.children}</Container>
+    <Box h="full">
+      <Container h="full" py="4">
+        {props.children}
+      </Container>
     </Box>
   );
 };
