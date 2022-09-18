@@ -1,3 +1,80 @@
 {
-  "db": "PostgreSQL"
+  "db": "PostgreSQL",
+  "2550db89779a469adb7a6eb8f5fe29cc8716715a95321bdcb8461b18f737aba9": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Timestamptz",
+          "Int4"
+        ]
+      }
+    },
+    "query": "\ninsert into attachments\n(record_type, record_id, record_name, created_at, blob_id)\nvalues\n($1, $2, $3, $4, $5)\n            "
+  },
+  "31caf3a512281a7a4dd7020d8e31b9953edba89a9269634fa5c17dae0b1a527b": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "file_data",
+          "ordinal": 1,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "filename",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "content_type",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "byte_size",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "metadata",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Text",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "\ninsert into blobs\n(file_data, filename, content_type, byte_size, metadata, created_at)\nvalues\n($1, $2, $3, $4, $5, $6)\nreturning *\n            "
+  }
 }
