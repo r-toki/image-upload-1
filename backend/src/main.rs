@@ -1,3 +1,6 @@
+mod application;
+mod domain;
+mod infrastructure;
 mod lib;
 mod presentation;
 

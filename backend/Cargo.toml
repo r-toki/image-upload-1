@@ -27,5 +27,6 @@ sqlx = { version = "0.6", features = [
   "offline",
   "chrono",
 ] }
+thiserror = "1.0"
 ulid = { version = "1.0", features = ["serde"] }
 validator = { version = "0.16", features = ["derive"] }

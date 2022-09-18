@@ -18,7 +18,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new() -> Result<Self, config::ConfigError> {
+    fn new() -> Result<Self, config::ConfigError> {
         let environment = config::Environment::default().try_parsing(true);
         let config = config::Config::builder()
             .set_default("host", "127.0.0.1")?
