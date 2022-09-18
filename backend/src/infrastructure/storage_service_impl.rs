@@ -1,8 +1,9 @@
 use crate::application::service::storage_service::{Attachment, Blob, Error, StorageService};
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use derive_new::new;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use sqlx::{query, PgPool};
 use std::sync::Arc;
 
 #[derive(new, Debug, Clone)]
@@ -12,7 +13,7 @@ pub struct StorageServiceImpl {
 
 #[async_trait]
 impl StorageService for StorageServiceImpl {
-    async fn store(&self, attachment: Attachment, blob: Blob) -> Result<(), Error> {
+    async fn insert(&self, attachment: Attachment, blob: Blob) -> Result<(), Error> {
         Ok(())
     }
 }
@@ -22,7 +23,8 @@ pub struct AttachmentRow {
     pub id: i64,
     pub record_type: String,
     pub record_id: String,
-    pub record_column_name: String,
+    pub record_name: String,
+    pub created_at: DateTime<Utc>,
     pub blob_id: String,
 }
 
@@ -34,4 +36,5 @@ pub struct BlobRow {
     pub content_type: String,
     pub byte_size: String,
     pub metadata: String,
+    pub created_at: DateTime<Utc>,
 }

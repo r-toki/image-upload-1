@@ -1,9 +1,10 @@
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use derive_new::new;
 
 #[async_trait]
 pub trait StorageService {
-    async fn store(&self, attachment: Attachment, blob: Blob) -> Result<(), Error>;
+    async fn insert(&self, attachment: Attachment, blob: Blob) -> Result<(), Error>;
     // async fn delete(&self, attachment: Attachment) -> Result<(), Error>;
     // async fn find(&self, attachment: Attachment) -> Result<Blob, Error>;
 }
@@ -18,7 +19,8 @@ pub enum Error {
 pub struct Attachment {
     pub record_type: String,
     pub record_id: String,
-    pub record_column_name: String,
+    pub record_name: String,
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(new, Debug)]
@@ -28,4 +30,5 @@ pub struct Blob {
     pub content_type: String,
     pub byte_size: String,
     pub metadata: String,
+    pub created_at: DateTime<Utc>,
 }
