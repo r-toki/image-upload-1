@@ -26,7 +26,7 @@ pub struct AttachmentRow {
     pub blob_id: String,
 }
 
-#[derive(new, Debug)]
+#[derive(new, Debug, Serialize, Deserialize)]
 pub struct BlobRow {
     pub id: i64,
     pub file_data: Vec<u8>,

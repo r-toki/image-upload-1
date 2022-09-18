@@ -1,6 +1,13 @@
 use async_trait::async_trait;
 use derive_new::new;
 
+#[async_trait]
+pub trait StorageService {
+    async fn store(&self, attachment: Attachment, blob: Blob) -> Result<(), Error>;
+    // async fn delete(&self, attachment: Attachment) -> Result<(), Error>;
+    // async fn find(&self, attachment: Attachment) -> Result<Blob, Error>;
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("{}", .0)]
@@ -21,11 +28,4 @@ pub struct Blob {
     pub content_type: String,
     pub byte_size: String,
     pub metadata: String,
-}
-
-#[async_trait]
-pub trait StorageService {
-    async fn store(&self, attachment: Attachment, blob: Blob) -> Result<(), Error>;
-    // async fn delete(&self, attachment: Attachment) -> Result<(), Error>;
-    // async fn find(&self, attachment: Attachment) -> Result<Blob, Error>;
 }
