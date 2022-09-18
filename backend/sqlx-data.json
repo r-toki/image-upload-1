@@ -1,6 +1,6 @@
 {
   "db": "PostgreSQL",
-  "2550db89779a469adb7a6eb8f5fe29cc8716715a95321bdcb8461b18f737aba9": {
+  "b269f4c377fd60908d092d41c3b33a94bacf3d3bd8ffa4612f5e18bae1f559e0": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -9,14 +9,13 @@
           "Varchar",
           "Varchar",
           "Varchar",
-          "Timestamptz",
           "Int4"
         ]
       }
     },
-    "query": "\ninsert into attachments\n(record_type, record_id, record_name, created_at, blob_id)\nvalues\n($1, $2, $3, $4, $5)\n            "
+    "query": "\ninsert into attachments\n(record_type, record_id, record_name, created_at, blob_id)\nvalues\n($1, $2, $3, current_timestamp, $4)\n            "
   },
-  "31caf3a512281a7a4dd7020d8e31b9953edba89a9269634fa5c17dae0b1a527b": {
+  "d0086fad049b5f1fecaf96523f7a5b21bc1ba71db5a35fad34dffd77315df7f3": {
     "describe": {
       "columns": [
         {
@@ -70,11 +69,10 @@
           "Varchar",
           "Varchar",
           "Varchar",
-          "Text",
-          "Timestamptz"
+          "Text"
         ]
       }
     },
-    "query": "\ninsert into blobs\n(file_data, filename, content_type, byte_size, metadata, created_at)\nvalues\n($1, $2, $3, $4, $5, $6)\nreturning *\n            "
+    "query": "\ninsert into blobs\n(file_data, filename, content_type, byte_size, metadata, created_at)\nvalues\n($1, $2, $3, $4, $5, current_timestamp)\nreturning *\n            "
   }
 }

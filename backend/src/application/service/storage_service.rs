@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
 use derive_new::new;
 
 #[async_trait]
@@ -20,7 +19,6 @@ pub struct Attachment {
     pub record_type: String,
     pub record_id: String,
     pub record_name: String,
-    pub created_at: DateTime<Utc>,
 }
 
 #[derive(new, Debug)]
@@ -30,5 +28,4 @@ pub struct Blob {
     pub content_type: String,
     pub byte_size: String,
     pub metadata: String,
-    pub created_at: DateTime<Utc>,
 }

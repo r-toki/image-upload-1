@@ -20,7 +20,7 @@ impl StorageService for StorageServiceImpl {
 insert into blobs
 (file_data, filename, content_type, byte_size, metadata, created_at)
 values
-($1, $2, $3, $4, $5, $6)
+($1, $2, $3, $4, $5, current_timestamp)
 returning *
             "#,
             blob.file_data,
@@ -28,7 +28,6 @@ returning *
             blob.content_type,
             blob.byte_size,
             blob.metadata,
-            blob.created_at
         )
         .fetch_one(&*self.pool)
         .await?;
@@ -38,12 +37,11 @@ returning *
 insert into attachments
 (record_type, record_id, record_name, created_at, blob_id)
 values
-($1, $2, $3, $4, $5)
+($1, $2, $3, current_timestamp, $4)
             "#,
             attachment.record_type,
             attachment.record_id,
             attachment.record_name,
-            attachment.created_at,
             blob.id
         )
         .execute(&*self.pool)
