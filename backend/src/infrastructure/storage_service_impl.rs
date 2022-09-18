@@ -29,7 +29,7 @@ pub struct AttachmentRow {
 #[derive(new, Debug)]
 pub struct BlobRow {
     pub id: i64,
-    pub encoded: Vec<u8>,
+    pub file_data: Vec<u8>,
     pub filename: String,
     pub content_type: String,
     pub byte_size: String,

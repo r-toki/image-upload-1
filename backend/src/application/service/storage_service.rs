@@ -16,7 +16,7 @@ pub struct Attachment {
 
 #[derive(new, Debug)]
 pub struct Blob {
-    pub encoded: Vec<u8>,
+    pub file_data: Vec<u8>,
     pub filename: String,
     pub content_type: String,
     pub byte_size: String,
