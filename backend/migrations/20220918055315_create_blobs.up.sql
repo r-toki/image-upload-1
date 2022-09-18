@@ -1,5 +1,5 @@
 create table blobs (
-  id bigserial primary key,
+  id serial primary key,
   file_data bytea not null,
   filenmae varchar not null,
   content_type varchar not null,
