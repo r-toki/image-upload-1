@@ -13,9 +13,10 @@ pub struct BlobUseCase<R: BlobRepository> {
 
 impl<R: BlobRepository> BlobUseCase<R> {
     pub async fn find_all_blobs(&self) -> anyhow::Result<Vec<BlobResponseDto>> {
-        let blobs = self.blob_repository.find_all().await?;
-
-        Ok(blobs.into_iter().map(|blob| blob.into()).collect())
+        self.blob_repository
+            .find_all()
+            .await
+            .map(|blobs| blobs.into_iter().map(|blob| blob.into()).collect())
     }
 
     pub async fn create_blob(
@@ -46,9 +47,7 @@ impl<R: BlobRepository> BlobUseCase<R> {
     }
 
     pub async fn find_blob(&self, id: String) -> anyhow::Result<BlobResponseDto> {
-        let blob = self.blob_repository.find(id).await?;
-
-        Ok(blob.into())
+        self.blob_repository.find(id).await.map(|blob| blob.into())
     }
 
     pub async fn delete_blob(&self, id: String) -> anyhow::Result<()> {
@@ -57,6 +56,7 @@ impl<R: BlobRepository> BlobUseCase<R> {
 }
 
 #[derive(new, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BlobResponseDto {
     pub id: String,
     pub encoded: String,

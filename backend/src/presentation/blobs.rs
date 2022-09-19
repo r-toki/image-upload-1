@@ -6,7 +6,7 @@ use actix_web::{
     get, post,
     web::{Data, Json, Path, ServiceConfig},
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 pub fn init(cfg: &mut ServiceConfig) {
     cfg.service(index);
@@ -25,7 +25,8 @@ async fn index(module: Data<Module>) -> actix_web::Result<Json<Vec<BlobResponseD
         .map_err(ErrorInternalServerError)
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct CreateForm {
     encoded: String,
     name: String,
