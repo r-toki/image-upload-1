@@ -1,9 +1,8 @@
-use crate::application::service::blob::{Blob, BlobRepository};
+use crate::application::service::blob::{Blob, BlobRepository, Metadata};
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
 use derive_new::new;
-use sqlx::{query, query_as, PgPool};
-use std::sync::Arc;
+use sqlx::{query, PgPool};
+use std::{convert::TryInto, sync::Arc};
 
 #[derive(new, Debug, Clone)]
 pub struct BlobRepositoryImpl {
@@ -13,7 +12,9 @@ pub struct BlobRepositoryImpl {
 #[async_trait]
 impl BlobRepository for BlobRepositoryImpl {
     async fn store(&self, blob: Blob) -> anyhow::Result<()> {
-        let blob_row: BlobRow = blob.into();
+        let byte_size: i32 = blob.byte_size.try_into()?;
+        let metadata = serde_json::to_string(&blob.metadata)?;
+
         query!(
             r#"
 insert into blobs
@@ -21,13 +22,13 @@ insert into blobs
 values
 ($1, $2, $3, $4, $5, $6, $7)
             "#,
-            blob_row.id,
-            blob_row.data,
-            blob_row.name,
-            blob_row.content_type,
-            blob_row.byte_size,
-            blob_row.metadata,
-            blob_row.created_at,
+            blob.id,
+            blob.data,
+            blob.name,
+            blob.content_type,
+            byte_size,
+            metadata,
+            blob.created_at,
         )
         .execute(&*self.pool)
         .await?;
@@ -50,8 +51,7 @@ where id = $1
     }
 
     async fn find(&self, id: String) -> anyhow::Result<Blob> {
-        let blob_row = query_as!(
-            BlobRow,
+        let r = query!(
             r#"
 select * from blobs
 where id = $1
@@ -61,45 +61,17 @@ where id = $1
         .fetch_one(&*self.pool)
         .await?;
 
-        Ok(blob_row.into())
-    }
-}
+        let metadata = serde_json::from_str::<Metadata>(&r.metadata)?;
+        let blob = Blob::new(
+            r.id,
+            r.data,
+            r.name,
+            r.content_type,
+            r.byte_size as u32,
+            metadata,
+            r.created_at,
+        );
 
-#[derive(Debug)]
-struct BlobRow {
-    pub id: String,
-    pub data: Vec<u8>,
-    pub name: String,
-    pub content_type: String,
-    pub byte_size: i32,
-    pub metadata: String,
-    pub created_at: DateTime<Utc>,
-}
-
-impl From<BlobRow> for Blob {
-    fn from(blob_row: BlobRow) -> Self {
-        Self {
-            id: blob_row.id,
-            data: blob_row.data,
-            name: blob_row.name,
-            content_type: blob_row.content_type,
-            byte_size: blob_row.byte_size,
-            metadata: serde_json::from_str(&blob_row.metadata).unwrap(),
-            created_at: blob_row.created_at,
-        }
-    }
-}
-
-impl From<Blob> for BlobRow {
-    fn from(blob: Blob) -> Self {
-        Self {
-            id: blob.id,
-            data: blob.data,
-            name: blob.name,
-            content_type: blob.content_type,
-            byte_size: blob.byte_size,
-            metadata: serde_json::to_string(&blob.metadata).unwrap(),
-            created_at: blob.created_at,
-        }
+        Ok(blob)
     }
 }

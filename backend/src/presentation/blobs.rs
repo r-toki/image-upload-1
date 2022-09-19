@@ -1,4 +1,4 @@
-use crate::application::service::blob::Blob;
+use crate::application::use_case::blob_use_case::BlobDto;
 use crate::lib::module::Module;
 use actix_web::{
     error::ErrorInternalServerError,
@@ -14,7 +14,7 @@ pub fn init(cfg: &mut ServiceConfig) {
 
 #[derive(Debug, Serialize, Deserialize)]
 struct CreateForm {
-    encoded_data: String,
+    encoded: String,
     name: String,
     content_type: String,
 }
@@ -24,7 +24,7 @@ async fn create(module: Data<Module>, form: Json<CreateForm>) -> actix_web::Resu
     module
         .blob_use_case
         .create_blob(
-            form.encoded_data.to_owned(),
+            form.encoded.to_owned(),
             form.name.to_owned(),
             form.content_type.to_owned(),
         )
@@ -43,13 +43,12 @@ mod blob {
     }
 
     #[get("/blobs/{blob_id}")]
-    async fn index(module: Data<Module>, path: Path<BlobPath>) -> actix_web::Result<Json<Blob>> {
-        let blob = module
+    async fn index(module: Data<Module>, path: Path<BlobPath>) -> actix_web::Result<Json<BlobDto>> {
+        module
             .blob_use_case
-            .find_blob(path.blob_id.to_string())
+            .find_blob(path.blob_id.to_owned())
             .await
-            .map_err(ErrorInternalServerError)?;
-
-        Ok(Json(blob))
+            .map(Json)
+            .map_err(ErrorInternalServerError)
     }
 }
