@@ -1,1 +1,1 @@
-pub mod storage_service_impl;
+pub mod blob_repository_impl;

@@ -1,35 +1,32 @@
 {
   "db": "PostgreSQL",
-  "b269f4c377fd60908d092d41c3b33a94bacf3d3bd8ffa4612f5e18bae1f559e0": {
+  "00ff3a33de9c1cbb9df2f7c76182554cf950ad8b08c51fd4847746c5eaa6eaf9": {
     "describe": {
       "columns": [],
       "nullable": [],
       "parameters": {
         "Left": [
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Int4"
+          "Text"
         ]
       }
     },
-    "query": "\ninsert into attachments\n(record_type, record_id, record_name, created_at, blob_id)\nvalues\n($1, $2, $3, current_timestamp, $4)\n            "
+    "query": "\ndelete from blobs\nwhere id = $1\n            "
   },
-  "d0086fad049b5f1fecaf96523f7a5b21bc1ba71db5a35fad34dffd77315df7f3": {
+  "5bdd23153f231b6a621147e4900eced16456ee040816053ccffe72d70b4b15f0": {
     "describe": {
       "columns": [
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int4"
+          "type_info": "Varchar"
         },
         {
-          "name": "file_data",
+          "name": "data",
           "ordinal": 1,
           "type_info": "Bytea"
         },
         {
-          "name": "filename",
+          "name": "name",
           "ordinal": 2,
           "type_info": "Varchar"
         },
@@ -65,14 +62,28 @@
       ],
       "parameters": {
         "Left": [
-          "Bytea",
-          "Varchar",
-          "Varchar",
-          "Varchar",
           "Text"
         ]
       }
     },
-    "query": "\ninsert into blobs\n(file_data, filename, content_type, byte_size, metadata, created_at)\nvalues\n($1, $2, $3, $4, $5, current_timestamp)\nreturning *\n            "
+    "query": "\nselect * from blobs\nwhere id = $1\n            "
+  },
+  "e832f88c16c6bb1c5efa4da50598775ec804922a6664757d56aa29368d492a98": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Bytea",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Text",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "\ninsert into blobs\n(id, data, name, content_type, byte_size, metadata, created_at)\nvalues\n($1, $2, $3, $4, $5, $6, $7)\n            "
   }
 }

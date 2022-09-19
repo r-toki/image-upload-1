@@ -1,8 +1,8 @@
 create table attachments (
-  id serial primary key,
-  record_type varchar not null,
-  record_id varchar not null,
-  record_name varchar not null,
-  created_at timestamptz not null,
-  blob_id int references attachments(id) on delete cascade
+  id varchar primary key,
+  record_type varchar,
+  record_id varchar,
+  record_name varchar,
+  blob_id varchar,
+  created_at timestamptz not null
 );

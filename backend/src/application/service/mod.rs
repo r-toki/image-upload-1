@@ -1,1 +1,2 @@
-pub mod storage_service;
+pub mod blob_repository;
+pub mod error;
