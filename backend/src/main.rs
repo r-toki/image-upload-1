@@ -30,6 +30,7 @@ async fn main() -> Result<(), std::io::Error> {
             .wrap(Logger::default())
             .wrap(cors)
             .configure(presentation::index::init)
+            .configure(presentation::blobs::init)
     })
     .bind(format!("{}:{}", host, port))?
     .run()

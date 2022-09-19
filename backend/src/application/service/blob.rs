@@ -1,14 +1,7 @@
-use crate::application::service::error::Error;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use ulid::Ulid;
-
-#[async_trait]
-pub trait BlobRepository {
-    async fn store(&self, blob: Blob) -> Result<(), Error>;
-    async fn delete(&self, id: String) -> Result<(), Error>;
-    async fn find(&self, id: String) -> Result<Blob, Error>;
-}
 
 #[derive(Debug)]
 pub struct Blob {
@@ -17,8 +10,14 @@ pub struct Blob {
     pub name: String,
     pub content_type: String,
     pub byte_size: String,
-    pub metadata: String,
+    pub metadata: Metadata,
     pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Metadata {
+    pub width: i16,
+    pub height: i16,
 }
 
 impl Blob {
@@ -27,7 +26,7 @@ impl Blob {
         name: String,
         content_type: String,
         byte_size: String,
-        metadata: String,
+        metadata: Metadata,
     ) -> Self {
         Self {
             id: Ulid::new().to_string(),
@@ -39,4 +38,11 @@ impl Blob {
             created_at: Utc::now(),
         }
     }
+}
+
+#[async_trait]
+pub trait BlobRepository {
+    async fn store(&self, blob: Blob) -> anyhow::Result<()>;
+    async fn delete(&self, id: String) -> anyhow::Result<()>;
+    async fn find(&self, id: String) -> anyhow::Result<Blob>;
 }
