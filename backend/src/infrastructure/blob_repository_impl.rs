@@ -71,7 +71,7 @@ struct BlobRow {
     pub data: Vec<u8>,
     pub name: String,
     pub content_type: String,
-    pub byte_size: String,
+    pub byte_size: i32,
     pub metadata: String,
     pub created_at: DateTime<Utc>,
 }

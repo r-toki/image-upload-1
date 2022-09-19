@@ -3,7 +3,7 @@ create table blobs (
   data bytea not null,
   name varchar not null,
   content_type varchar not null,
-  byte_size varchar not null,
+  byte_size int not null,
   metadata text not null,
   created_at timestamptz not null
 );

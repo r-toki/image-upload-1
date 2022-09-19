@@ -28,8 +28,10 @@ async fn main() -> Result<(), std::io::Error> {
         let cors = Cors::default()
             .allowed_origin(&frontend_origin)
             .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
-            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-            .allowed_header(http::header::CONTENT_TYPE)
+            .allowed_headers(vec![
+                http::header::AUTHORIZATION,
+                http::header::CONTENT_TYPE,
+            ])
             .max_age(3_600);
 
         App::new()
