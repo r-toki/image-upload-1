@@ -12,20 +12,34 @@ import { FormEventHandler } from 'react';
 
 import { useFileInput } from '../hooks/useFileInput';
 import { useObjectUrl } from '../hooks/useObjectUrl';
+import { useTextInput } from '../hooks/useTextInput';
 import { encodeFile } from '../lib/encode-file';
 
 export const ImageUploadForm = () => {
   const toast = useToast();
 
+  const nameInput = useTextInput();
   const fileInput = useFileInput();
   const objectUrl = useObjectUrl(fileInput.file);
 
   const onSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
 
-    if (fileInput.file) {
-      const encoded = await encodeFile(fileInput.file);
-      console.log(encoded);
+    const file = fileInput.file;
+    if (file) {
+      const encoded = await encodeFile(file);
+
+      fetch('http://127.0.0.1:8080/blobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          encoded_data: encoded,
+          name: nameInput.value,
+          content_type: file.type,
+        }),
+      })
+        .then((res) => res.json())
+        .then(console.log);
     } else {
       toast({ position: 'top-right', status: 'error', title: 'Image is required.' });
     }
@@ -37,7 +51,7 @@ export const ImageUploadForm = () => {
         <FormLabel width="32" flexShrink="0">
           Name
         </FormLabel>
-        <Input type="text" size="sm" />
+        <Input type="text" size="sm" value={nameInput.value} onChange={nameInput.onChange} />
       </FormControl>
 
       <FormControl isRequired display="flex">
