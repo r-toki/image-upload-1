@@ -15,11 +15,14 @@ export const useFileInput = () => {
     ref.current?.click();
   };
 
+  const reset = () => setFile(undefined);
+
   return {
     file,
     setFile,
     ref,
     onChange,
     onClick,
+    reset,
   };
 };

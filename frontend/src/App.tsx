@@ -1,18 +1,32 @@
-import { Box, Container, VStack } from '@chakra-ui/react';
+import { Box, Container, Stack, VStack, Wrap, WrapItem } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 
 import { ImageUploadForm } from './components/ImageUploadForm';
+import { PhotoItem } from './components/PhotoItem';
+import { usePhotos } from './hooks/usePhotos';
 
 export const App = () => {
+  const { photos, createPhoto, deletePhoto } = usePhotos();
+
   return (
     <AppLayout>
-      <VStack spacing="4">
-        <Box fontWeight="bold" fontSize="xl">
-          Image Upload Form
-        </Box>
+      <Stack direction="row" spacing="20">
+        <VStack spacing="4">
+          <Box fontWeight="bold" fontSize="xl">
+            Image Upload Form
+          </Box>
 
-        <ImageUploadForm />
-      </VStack>
+          <ImageUploadForm onSubmit={createPhoto} />
+        </VStack>
+
+        <Wrap spacing="4">
+          {photos.map((photo) => (
+            <WrapItem key={photo.id}>
+              <PhotoItem photo={photo} onDelete={deletePhoto} />
+            </WrapItem>
+          ))}
+        </Wrap>
+      </Stack>
     </AppLayout>
   );
 };
@@ -20,10 +34,11 @@ export const App = () => {
 type AppLayoutProps = {
   children: ReactNode;
 };
+
 const AppLayout = (props: AppLayoutProps) => {
   return (
     <Box h="full">
-      <Container h="full" py="4">
+      <Container maxW="container.xl" h="full" py="4">
         {props.children}
       </Container>
     </Box>
