@@ -12,6 +12,60 @@
     },
     "query": "\ndelete from blobs\nwhere id = $1\n            "
   },
+  "3d4414784d109f90621c18dec897d6e39b3466c0b46b98f2a4144e8aa779370b": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "data",
+          "ordinal": 1,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "name",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "content_type",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "byte_size",
+          "ordinal": 4,
+          "type_info": "Int4"
+        },
+        {
+          "name": "metadata",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\nselect * from blobs\n            "
+  },
   "5bdd23153f231b6a621147e4900eced16456ee040816053ccffe72d70b4b15f0": {
     "describe": {
       "columns": [

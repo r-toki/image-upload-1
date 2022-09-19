@@ -1,7 +1,9 @@
-use crate::application::service::blob::{Blob, BlobRepository, Metadata};
+use crate::application::service::blob::{Blob, BlobRepository};
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use derive_new::new;
-use sqlx::{query, PgPool};
+use serde::{Deserialize, Serialize};
+use sqlx::{query, query_as, PgPool};
 use std::{convert::TryInto, sync::Arc};
 
 #[derive(new, Debug, Clone)]
@@ -12,8 +14,7 @@ pub struct BlobRepositoryImpl {
 #[async_trait]
 impl BlobRepository for BlobRepositoryImpl {
     async fn store(&self, blob: Blob) -> anyhow::Result<()> {
-        let byte_size: i32 = blob.byte_size.try_into()?;
-        let metadata = serde_json::to_string(&blob.metadata)?;
+        let blob_row: BlobRow = blob.into();
 
         query!(
             r#"
@@ -22,13 +23,13 @@ insert into blobs
 values
 ($1, $2, $3, $4, $5, $6, $7)
             "#,
-            blob.id,
-            blob.data,
-            blob.name,
-            blob.content_type,
-            byte_size,
-            metadata,
-            blob.created_at,
+            blob_row.id,
+            blob_row.data,
+            blob_row.name,
+            blob_row.content_type,
+            blob_row.byte_size,
+            blob_row.metadata,
+            blob_row.created_at,
         )
         .execute(&*self.pool)
         .await?;
@@ -51,7 +52,8 @@ where id = $1
     }
 
     async fn find(&self, id: String) -> anyhow::Result<Blob> {
-        let r = query!(
+        let blob_row = query_as!(
+            BlobRow,
             r#"
 select * from blobs
 where id = $1
@@ -61,17 +63,61 @@ where id = $1
         .fetch_one(&*self.pool)
         .await?;
 
-        let metadata = serde_json::from_str::<Metadata>(&r.metadata)?;
-        let blob = Blob::new(
-            r.id,
-            r.data,
-            r.name,
-            r.content_type,
-            r.byte_size as u32,
-            metadata,
-            r.created_at,
-        );
+        Ok(blob_row.into())
+    }
 
-        Ok(blob)
+    async fn find_all(&self) -> anyhow::Result<Vec<Blob>> {
+        let blob_rows = query_as!(
+            BlobRow,
+            r#"
+select * from blobs
+            "#
+        )
+        .fetch_all(&*self.pool)
+        .await?;
+
+        Ok(blob_rows
+            .into_iter()
+            .map(|blob_row| blob_row.into())
+            .collect())
+    }
+}
+
+#[derive(new, Debug, Serialize, Deserialize)]
+struct BlobRow {
+    pub id: String,
+    pub data: Vec<u8>,
+    pub name: String,
+    pub content_type: String,
+    pub byte_size: i32,
+    pub metadata: String,
+    pub created_at: DateTime<Utc>,
+}
+
+impl From<Blob> for BlobRow {
+    fn from(blob: Blob) -> Self {
+        BlobRow::new(
+            blob.id,
+            blob.data,
+            blob.name,
+            blob.content_type,
+            blob.byte_size.try_into().unwrap(),
+            serde_json::to_string(&blob.metadata).unwrap(),
+            blob.created_at,
+        )
+    }
+}
+
+impl From<BlobRow> for Blob {
+    fn from(blob_row: BlobRow) -> Self {
+        Blob::new(
+            blob_row.id,
+            blob_row.data,
+            blob_row.name,
+            blob_row.content_type,
+            blob_row.byte_size as u32,
+            serde_json::from_str(&blob_row.metadata).unwrap(),
+            blob_row.created_at,
+        )
     }
 }

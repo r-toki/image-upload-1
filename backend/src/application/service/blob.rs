@@ -25,4 +25,5 @@ pub trait BlobRepository {
     async fn store(&self, blob: Blob) -> anyhow::Result<()>;
     async fn delete(&self, id: String) -> anyhow::Result<()>;
     async fn find(&self, id: String) -> anyhow::Result<Blob>;
+    async fn find_all(&self) -> anyhow::Result<Vec<Blob>>;
 }

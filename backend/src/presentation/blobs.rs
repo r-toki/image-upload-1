@@ -1,4 +1,4 @@
-use crate::application::use_case::blob_use_case::BlobDto;
+use crate::application::use_case::blob_use_case::BlobResponseDto;
 use crate::lib::module::Module;
 use actix_web::{
     error::ErrorInternalServerError,
@@ -8,8 +8,19 @@ use actix_web::{
 use serde::{Deserialize, Serialize};
 
 pub fn init(cfg: &mut ServiceConfig) {
+    cfg.service(index);
     cfg.service(create);
     cfg.service(blob::index);
+}
+
+#[get("/blobs")]
+async fn index(module: Data<Module>) -> actix_web::Result<Json<Vec<BlobResponseDto>>> {
+    module
+        .blob_use_case
+        .find_all_blobs()
+        .await
+        .map(Json)
+        .map_err(ErrorInternalServerError)
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -29,9 +40,8 @@ async fn create(module: Data<Module>, form: Json<CreateForm>) -> actix_web::Resu
             form.content_type.to_owned(),
         )
         .await
-        .map_err(ErrorInternalServerError)?;
-
-    Ok(Json(()))
+        .map(Json)
+        .map_err(ErrorInternalServerError)
 }
 
 mod blob {
@@ -43,7 +53,10 @@ mod blob {
     }
 
     #[get("/blobs/{blob_id}")]
-    async fn index(module: Data<Module>, path: Path<BlobPath>) -> actix_web::Result<Json<BlobDto>> {
+    async fn index(
+        module: Data<Module>,
+        path: Path<BlobPath>,
+    ) -> actix_web::Result<Json<BlobResponseDto>> {
         module
             .blob_use_case
             .find_blob(path.blob_id.to_owned())

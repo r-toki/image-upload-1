@@ -41,15 +41,21 @@ impl<R: BlobRepository> BlobUseCase<R> {
         Ok(())
     }
 
-    pub async fn find_blob(&self, id: String) -> anyhow::Result<BlobDto> {
+    pub async fn find_blob(&self, id: String) -> anyhow::Result<BlobResponseDto> {
         let blob = self.blob_repository.find(id).await?;
 
         Ok(blob.into())
     }
+
+    pub async fn find_all_blobs(&self) -> anyhow::Result<Vec<BlobResponseDto>> {
+        let blobs = self.blob_repository.find_all().await?;
+
+        Ok(blobs.into_iter().map(|blob| blob.into()).collect())
+    }
 }
 
 #[derive(new, Debug, Serialize)]
-pub struct BlobDto {
+pub struct BlobResponseDto {
     pub id: String,
     pub encoded: String,
     pub name: String,
@@ -59,18 +65,16 @@ pub struct BlobDto {
     pub created_at: DateTime<Utc>,
 }
 
-impl From<Blob> for BlobDto {
+impl From<Blob> for BlobResponseDto {
     fn from(blob: Blob) -> Self {
-        let encoded = base64::encode(blob.data);
-        let blob_dto = BlobDto::new(
+        BlobResponseDto::new(
             blob.id,
-            encoded,
+            base64::encode(blob.data),
             blob.name,
             blob.content_type,
             blob.byte_size,
             blob.metadata,
             blob.created_at,
-        );
-        blob_dto
+        )
     }
 }
