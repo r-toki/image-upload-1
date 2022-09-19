@@ -6,8 +6,10 @@ mod presentation;
 
 use crate::lib::config::CONFIG;
 use actix_cors::Cors;
-use actix_web::{http, middleware::Logger, App, HttpServer};
+use actix_web::{http, middleware::Logger, web::Data, App, HttpServer};
 use dotenv::dotenv;
+use lib::module::Module;
+use sqlx::PgPool;
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
@@ -19,6 +21,9 @@ async fn main() -> Result<(), std::io::Error> {
     let database_url = &CONFIG.database_url;
     let frontend_origin = &CONFIG.frontend_origin;
 
+    let pool = PgPool::connect(database_url).await.unwrap();
+    let module = Module::new(pool);
+
     HttpServer::new(move || {
         let cors = Cors::default()
             .allowed_origin(&frontend_origin)
@@ -28,6 +33,7 @@ async fn main() -> Result<(), std::io::Error> {
             .max_age(3_600);
 
         App::new()
+            .app_data(Data::new(module.clone()))
             .wrap(Logger::default())
             .wrap(cors)
             .configure(presentation::index::init)
