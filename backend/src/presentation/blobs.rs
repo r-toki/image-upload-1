@@ -1,6 +1,7 @@
 use crate::application::use_case::blob_use_case::BlobResponseDto;
 use crate::lib::module::Module;
 use actix_web::{
+    delete,
     error::ErrorInternalServerError,
     get, post,
     web::{Data, Json, Path, ServiceConfig},
@@ -11,6 +12,7 @@ pub fn init(cfg: &mut ServiceConfig) {
     cfg.service(index);
     cfg.service(create);
     cfg.service(blob::index);
+    cfg.service(blob::destroy);
 }
 
 #[get("/blobs")]
@@ -60,6 +62,16 @@ mod blob {
         module
             .blob_use_case
             .find_blob(path.blob_id.to_owned())
+            .await
+            .map(Json)
+            .map_err(ErrorInternalServerError)
+    }
+
+    #[delete("/blobs/{blob_id}")]
+    async fn destroy(module: Data<Module>, path: Path<BlobPath>) -> actix_web::Result<Json<()>> {
+        module
+            .blob_use_case
+            .delete_blob(path.blob_id.to_owned())
             .await
             .map(Json)
             .map_err(ErrorInternalServerError)

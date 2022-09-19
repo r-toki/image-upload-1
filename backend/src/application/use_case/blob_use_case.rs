@@ -12,6 +12,12 @@ pub struct BlobUseCase<R: BlobRepository> {
 }
 
 impl<R: BlobRepository> BlobUseCase<R> {
+    pub async fn find_all_blobs(&self) -> anyhow::Result<Vec<BlobResponseDto>> {
+        let blobs = self.blob_repository.find_all().await?;
+
+        Ok(blobs.into_iter().map(|blob| blob.into()).collect())
+    }
+
     pub async fn create_blob(
         &self,
         encoded: String,
@@ -36,9 +42,7 @@ impl<R: BlobRepository> BlobUseCase<R> {
             Utc::now(),
         );
 
-        self.blob_repository.store(blob).await?;
-
-        Ok(())
+        self.blob_repository.store(blob).await
     }
 
     pub async fn find_blob(&self, id: String) -> anyhow::Result<BlobResponseDto> {
@@ -47,10 +51,8 @@ impl<R: BlobRepository> BlobUseCase<R> {
         Ok(blob.into())
     }
 
-    pub async fn find_all_blobs(&self) -> anyhow::Result<Vec<BlobResponseDto>> {
-        let blobs = self.blob_repository.find_all().await?;
-
-        Ok(blobs.into_iter().map(|blob| blob.into()).collect())
+    pub async fn delete_blob(&self, id: String) -> anyhow::Result<()> {
+        self.blob_repository.delete(id).await
     }
 }
 
